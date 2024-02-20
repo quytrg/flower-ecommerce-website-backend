@@ -30,8 +30,8 @@ class ProductService {
         return products
     }
 
-    async findBySlug(slug) {
-        const product = await this.Product.findOne({ slug, deleted: false })
+    async findOne(filter) {
+        const product = await this.Product.findOne(filter)
         return product
     }
 

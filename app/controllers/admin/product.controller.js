@@ -167,13 +167,17 @@ module.exports.create = async (req, res, next) => {
 }
 
 // [GET] /products/:slug
-module.exports.findOne = async (req, res, next) => {
+module.exports.findBySlug = async (req, res, next) => {
     try {
-        const { slug } = req.params
-       
         const productService = new ProductService()
-        const product = await productService.findBySlug(slug)
-        return res.send(product)
+
+        const { slug } = req.params
+        const filter = {
+            slug,
+            deleted: false 
+        }
+        const product = await productService.findOne(filter)
+        return res.json(product)
     }
     catch (err) {
         return next (

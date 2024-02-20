@@ -14,7 +14,7 @@ router.route('/change-multi')
     .patch(productController.updateMany)
 
 router.route('/:slug')
-    .get(productController.findOne)
+    .get(productController.findBySlug)
 
 router.route('/:id')
     .patch(
