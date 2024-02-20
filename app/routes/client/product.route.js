@@ -6,7 +6,7 @@ const productController = require('../../controllers/client/product.controller')
 router.route('/product-details/:slug')
     .get(productController.findOne)
 
-router.route('/category/:category')
+router.route('/category/:categorySlug')
     .get(productController.findByCategory)
 
 router.route('/')
