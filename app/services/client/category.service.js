@@ -14,19 +14,6 @@ class CategoryService {
         const category = await this.Category.findOne(filter)
         return category
     }
-
-    async findCategoriesByProductId(id) {
-        const productCategoryService = new ProductCategoryService()
-        const categoryIds = await productCategoryService.findCategoryIdsByProductId(id)
-
-        const filter = {
-            _id: { $in: categoryIds },
-            deleted: false,
-            status: 'active'
-        }
-        const categories = await this.Category.find(filter).select('title slug')
-        return categories
-    }
 }
 
 module.exports = CategoryService
