@@ -79,7 +79,37 @@ module.exports.updateMany = async (req, res, next) => {
 
     try {
         const productService = new ProductService()
-        const document = await productService.updateMany(req.body)
+        const { ids, type } = req.body
+        let payload = {}
+        switch (type) {
+            case 'active':
+            case 'inactive':
+                payload = {
+                    status: type
+                }
+                break 
+            case 'delete':
+                payload = {
+                    deleted: true,
+                    deletedAt: new Date()
+                }
+                break
+            case 'position':
+                const document = []
+                const { positions } = req.body
+                for(let index = 0; index < ids.length; index++) {
+                    const result = await productService.updateOne(ids[index], { position: parseInt(positions[index]) })
+                    document.push(result)
+                }
+                res.send({
+                    message: "Change state of multiple product successfully",
+                    updatedDocument: document
+                })
+                return
+            default:
+                break
+        }
+        const document = await productService.updateMany(ids, payload)
         
         if (!document) {
             return next(new ApiError(404, "Product not found"))

@@ -37,45 +37,21 @@ class ProductService {
 
     async updateOne(id, payload) {
         const filter = {
-            _id: id
+            _id: id,
+            deleted: false
         }
         const data = this.extractProductData(payload)
         const result = await this.Product.updateOne(filter, data)
         return result
     }
 
-    async updateMany(data) {
-        const { ids, type } = data
-        let payload = {}
-        switch (type) {
-            case 'active':
-            case 'inactive':
-                payload = {
-                    status: type
-                }
-                break 
-            case 'delete':
-                payload = {
-                    deleted: true,
-                    deletedAt: new Date()
-                }
-                break
-            case 'position':
-                let result = []
-                const { positions } = data
-                for(let index = 0; index < ids.length; index++) {
-                    const doc = await this.updateOne({ _id: ids[index] }, { position: parseInt(positions[index]) })
-                    result.push(doc)
-                }
-                return result
-                break  
-            default:
-                break
-        }
+    async updateMany(ids, payload) {
         const filter = {
-            _id: { $in: ids }
+            _id: { $in: ids },
+            deleted: false
         }
-        const result = await this.Product.updateMany(filter, this.extractProductData(payload))
+        const data = this.extractProductData(payload)
+        const result = await this.Product.updateMany(filter, data)
         return result
     }
 
