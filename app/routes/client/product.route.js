@@ -4,7 +4,7 @@ const router = express.Router()
 const productController = require('../../controllers/client/product.controller')
 
 router.route('/product-details/:slug')
-    .get(productController.findOne)
+    .get(productController.findBySlug)
 
 router.route('/category/:categorySlug')
     .get(productController.findByCategory)

@@ -21,7 +21,7 @@ module.exports.find = async (req, res, next) => {
     }
 }
 
-// [GET] /products/category/:category
+// [GET] /products/category/:categorySlug
 module.exports.findByCategory = async (req, res, next) => {
     try {
         const productService = new ProductService()
@@ -47,12 +47,18 @@ module.exports.findByCategory = async (req, res, next) => {
 }
 
 // [GET] /products/product-detail/:slug
-module.exports.findOne = async (req, res, next) => {
+module.exports.findBySlug = async (req, res, next) => {
     try {
-        const { slug } = req.params
         const productService = new ProductService()
-        const product = await productService.findBySlug(slug)
-        return res.send(product)
+
+        const { slug } = req.params
+        const filter = {
+            slug,
+            deleted: false,
+            status: 'active'
+        }
+        const product = await productService.findOne(filter)
+        return res.json(product)
     }
     catch (err) {
         return next (

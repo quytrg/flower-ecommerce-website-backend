@@ -1,6 +1,3 @@
-const CategoryService = require('./category.service')
-const ProductCategoryService = require('./product-category.service')
-
 class ProductService {
     constructor() {
         this.Product = require('../../models/product.model')
@@ -11,8 +8,8 @@ class ProductService {
         return products
     }
 
-    async findBySlug(slug) {
-        const product = await this.Product.findOne({ slug, deleted: false, status: 'active' })
+    async findOne(filter) {
+        const product = await this.Product.findOne(filter)
         return product
     }
 }
