@@ -5,12 +5,14 @@ const CategoryService = require('../../services/admin/category.service.js')
 module.exports.find = async (req, res, next) => {
     try {
         const categoryService = new CategoryService()
-        const filter = {}
+        const filter = {
+            deleted: false,
+        }
         if (req.query.status) {
             filter.status = req.query.status
         }
         const categories = await categoryService.find(filter)
-        res.send(categories)
+        res.json(categories)
     }
     catch (err) {
         return next (

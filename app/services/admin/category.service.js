@@ -6,10 +6,6 @@ class CategoryService {
     }
 
     async find(filter, sort={ position: 'desc' }) {
-        filter = {
-            ...filter,
-            deleted: false
-        }
         const categories = await this.Category.find(filter).sort(sort)
         return categories
     }

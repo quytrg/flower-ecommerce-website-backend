@@ -1,5 +1,3 @@
-const ProductCategoryService = require('./product-category.service')
-
 class ProductService {
     constructor() {
         this.Product = require('../../models/product.model')
