@@ -8,12 +8,16 @@ const searchHelper = require('../../helpers/search.helper.js')
 // [GET] /products
 module.exports.find = async (req, res, next) => {
     try {
-        const filter = {}
+        const filter = {
+            deleted: false
+        }
         if (req.query.status) {
             filter.status = req.query.status
         }
         if (req.query.category) {
-            filter.category = req.query.category
+            const productCategoryService = new ProductCategoryService()
+            const productIds = await productCategoryService.findProductIdsByCategoryId(req.query.category)
+            filter._id = { $in: productIds }
         }
         if (req.query.keyword) {
             const searchObj = searchHelper(req.query)
@@ -22,7 +26,7 @@ module.exports.find = async (req, res, next) => {
 
         const productService = new ProductService()
         const products = await productService.find(filter)
-        return res.send(products)
+        return res.json(products)
     }
     catch (err) {
         return next (

@@ -26,15 +26,7 @@ class ProductService {
     }
 
     async find(filter, sort={ position: 'desc' }) {
-        const query = { ...filter, deleted: false }
-        if (filter.category) {
-            const productCategoryService = new ProductCategoryService()
-            const productIds = await productCategoryService.findProductIdsByCategoryId(filter.category)
-            query._id = { $in: productIds }
-            delete query.category
-        }
-
-        const products = await this.Product.find(query).sort(sort)
+        const products = await this.Product.find(filter).sort(sort)
         return products
     }
 
