@@ -131,9 +131,23 @@ module.exports.create = async (req, res, next) => {
     try {
         const productService = new ProductService()
         const productCategoryService = new ProductCategoryService()
+        console.log(req.body);
+        // create product information
+        req.body.price = parseFloat(req.body.price)
+        req.body.discountPercentage = parseInt(req.body.discountPercentage)
+        req.body.stock = parseInt(req.body.stock)
+
+        if (!req.body?.position) { 
+            req.body.position = await productService.count() + 1
+        } 
+        else {
+            req.body.position = parseInt(req.body.position)
+        }
+        console.log(req.body);
 
         const document = await productService.create(req.body)
         
+        // create categories
         const { categories } = req.body
         if (categories) {
             const categoryIds = categories.map(item => item._id)

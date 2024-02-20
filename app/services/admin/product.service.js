@@ -55,21 +55,9 @@ class ProductService {
         return result
     }
 
-    async create(data) {
-        const payload = { ...data }
-
-        payload.price = parseFloat(data.price)
-        payload.discountPercentage = parseInt(data.discountPercentage)
-        payload.stock = parseInt(data.stock)
-
-        if (!data?.position) { 
-            payload.position = await this.count() + 1
-        } 
-        else {
-            payload.position = parseInt(data.position)
-        }
-
-        const result = await this.Product.create(this.extractProductData(payload))
+    async create(payload) {
+        const data = this.extractProductData(payload)
+        const result = await this.Product.create(data)
         await result.save()
 
         return result
