@@ -24,7 +24,12 @@ module.exports.findOne = async (req, res, next) => {
     try {
         const categoryService = new CategoryService()
         const { slug } = req.params
-        const category = await categoryService.findBySlug(slug)
+        filter = {
+            slug,
+            deleted: false,
+            status: 'active'
+        }
+        const category = await categoryService.findOne(filter)
         res.send(category)    
     }
     catch (err) {

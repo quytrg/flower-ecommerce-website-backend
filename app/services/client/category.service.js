@@ -10,8 +10,8 @@ class CategoryService {
         return categories
     }
 
-    async findBySlug(slug) {
-        const category = await this.Category.findOne({ slug, deleted: false, status: 'active' })
+    async findOne(filter) {
+        const category = await this.Category.findOne(filter)
         return category
     }
 

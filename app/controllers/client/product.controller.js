@@ -29,7 +29,7 @@ module.exports.findByCategory = async (req, res, next) => {
         const productCategoryService = new ProductCategoryService()
 
         const { categorySlug } = req.params
-        const category = await categoryService.findBySlug(categorySlug)
+        const category = await categoryService.findOne({ slug: categorySlug, deleted: false, status: 'active' })
         const productIds = await productCategoryService.findProductIdsByCategoryId(category.id)
         const filter = {
             _id: { $in: productIds },
