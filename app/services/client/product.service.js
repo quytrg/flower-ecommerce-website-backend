@@ -7,11 +7,6 @@ class ProductService {
     }
 
     async find(filter, sort={ position: 'desc' }) {
-        filter = {
-            ...filter, 
-            deleted: false,
-            status: 'active'
-        }
         const products = await this.Product.find(filter).sort(sort)
         return products
     }

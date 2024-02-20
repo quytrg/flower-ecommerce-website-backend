@@ -5,7 +5,10 @@ const ProductService = require('../../services/client/product.service.js')
 module.exports.find = async (req, res, next) => {
     try {
         const productService = new ProductService()
-        const filter = {}
+        const filter = {
+            status: 'active',
+            deleted: false
+        }
         const products = await productService.find(filter)
         return res.send(products)
     }
