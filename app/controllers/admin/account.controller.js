@@ -1,28 +1,47 @@
 const ApiError = require('../../middlewares/api-error.js')
 const AccountService = require('../../services/admin/account.service.js')
-const searchHelper = require('../../helpers/search.helper.js')
 const md5 = require('md5')
+
+// helpers
+const searchHelper = require('../../helpers/search.helper.js')
+const paginationHelper = require('../../helpers/pagination.helper.js')
 
 // [GET] /accounts
 module.exports.find = async (req, res, next) => {
     try {
+        const accountService = new AccountService()
+
         const filter = { 
             deleted: false,
         }
+
+        // filter by status
         if (req.query.status) {
             filter.status = req.query.status
         }
-        if (req.query.category) {
-            filter.category = req.query.category
-        }
+
+        // seach
         if (req.query.keyword) {
             const searchObj = searchHelper(req.query)
             filter.fullName = searchObj.regex
         }
 
-        const accountService = new AccountService()
-        const accounts = await accountService.find(filter)
-        return res.send(accounts)
+        // pagination
+        const initPagination = {
+            currentPage: 1,
+            limit: 6
+        }
+        
+        initPagination.totalRecords = await accountService.count(filter)
+        const paginationObject = paginationHelper(req.query, initPagination)
+
+        const accounts = await accountService.find(filter, paginationObject)
+        return res.json({
+            accounts,
+            totalPages: paginationObject.totalPages,
+            limit: paginationObject.limit,
+            skip: paginationObject.skip
+        })
     }
     catch (err) {
         return next (

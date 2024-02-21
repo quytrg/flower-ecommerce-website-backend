@@ -24,8 +24,11 @@ class AccountService {
         return account
     }
 
-    async find(filter) {
+    async find(filter, pagination, sort={ position: 'desc' }) {
         const accounts = await this.Account.find(filter)
+                                        .limit(pagination.limit)
+                                        .skip(pagination.skip)
+                                        .sort(sort)
         return accounts
     }
 
@@ -40,25 +43,10 @@ class AccountService {
         }
         
         const data = this.extractAccountData(payload)
-
-        
-        
         const result = await this.Account.updateOne(filter, data)
 
         return result
     }
-
-    // async updateMany(ids, payload) {
-    //     const filter = {
-    //         _id: {$in: ids}
-    //     }
-
-    //     const data = this.extractProductData(payload)
-
-    //     const result = await this.Product.updateMany(filter, data)
-
-    //     return result
-    // }
 
     async create(payload) {
         const data = this.extractAccountData(payload)
@@ -69,15 +57,10 @@ class AccountService {
         return result
     }
 
-    // async count() {
-    //     const result = await this.Product.countDocuments()
-    //     return result
-    // }
-
-    // async findBySlug(slug) {
-    //     const product = await this.Product.findOne({ slug })
-    //     return product
-    // }
+    async count(filter) {
+        const result = await this.Account.countDocuments(filter)
+        return result
+    }
 
     async deleteOne(id) {
         const filter = {
