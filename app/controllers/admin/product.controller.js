@@ -4,29 +4,50 @@ const ProductCategoryService = require('../../services/admin/product-category.se
 
 // helpers
 const searchHelper = require('../../helpers/search.helper.js')
+const paginationHelper = require('../../helpers/pagination.helper.js')
 
 // [GET] /products
 module.exports.find = async (req, res, next) => {
     try {
+        const productService = new ProductService()
+
         const filter = {
             deleted: false
         }
+
+        // filter by status
         if (req.query.status) {
             filter.status = req.query.status
         }
+
+        // filter by cateogry
         if (req.query.category) {
             const productCategoryService = new ProductCategoryService()
             const productIds = await productCategoryService.findProductIdsByCategoryId(req.query.category)
             filter._id = { $in: productIds }
         }
+
+        // seach
         if (req.query.keyword) {
             const searchObj = searchHelper(req.query)
             filter.title = searchObj.regex
         }
 
-        const productService = new ProductService()
-        const products = await productService.find(filter)
-        return res.json(products)
+        // pagination
+        const initPagination = {
+            currentPage: 1,
+            limit: 6
+        }
+        initPagination.totalRecords = await productService.count(filter)
+        const paginationObject = paginationHelper(req.query, initPagination)
+
+        const products = await productService.find(filter, paginationObject)
+        return res.json({
+            products,
+            totalPages: paginationObject.totalPages,
+            limit: paginationObject.limit,
+            skip: paginationObject.skip
+        })
     }
     catch (err) {
         return next (
@@ -131,19 +152,18 @@ module.exports.create = async (req, res, next) => {
     try {
         const productService = new ProductService()
         const productCategoryService = new ProductCategoryService()
-        console.log(req.body);
+
         // create product information
         req.body.price = parseFloat(req.body.price)
         req.body.discountPercentage = parseInt(req.body.discountPercentage)
         req.body.stock = parseInt(req.body.stock)
 
         if (!req.body?.position) { 
-            req.body.position = await productService.count() + 1
+            req.body.position = await productService.count({ deleted: false }) + 1
         } 
         else {
             req.body.position = parseInt(req.body.position)
         }
-        console.log(req.body);
 
         const document = await productService.create(req.body)
         

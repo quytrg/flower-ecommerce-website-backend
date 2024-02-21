@@ -23,8 +23,11 @@ class ProductService {
         return product
     }
 
-    async find(filter, sort={ position: 'desc' }) {
-        const products = await this.Product.find(filter).sort(sort)
+    async find(filter, pagination, sort={ position: 'desc' }) {
+        const products = await this.Product.find(filter)
+                                        .limit(pagination.limit)
+                                        .skip(pagination.skip)
+                                        .sort(sort)
         return products
     }
 
@@ -61,8 +64,8 @@ class ProductService {
         return result
     }
 
-    async count() {
-        const result = await this.Product.countDocuments()
+    async count(filter) {
+        const result = await this.Product.countDocuments(filter)
         return result
     }
 
