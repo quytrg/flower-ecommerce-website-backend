@@ -175,9 +175,13 @@ module.exports.create = async (req, res, next) => {
 module.exports.findOne = async (req, res, next) => {
     try {
         const { id } = req.params
+        const filter = {
+            _id: id,
+            deleted: false,
+        }
        
         const accountService = new AccountService()
-        const account = await accountService.findById(id)
+        const account = await accountService.findOne(filter)
         return res.send(account)
     }
     catch (err) {
@@ -195,7 +199,8 @@ module.exports.deleteOne = async (req, res, next) => {
         const accountService = new AccountService()
         const document = await accountService.deleteOne(id)
 
-        res.send({
+        res.json({
+            code: 200,
             message: `Delete account ${id} successfully`,
             updatedDocument: document
         })

@@ -32,8 +32,8 @@ class AccountService {
         return accounts
     }
 
-    async findById(id) {
-        const account = await this.Account.findOne({ _id: id, deleted: false })
+    async findOne(filter) {
+        const account = await this.Account.findOne(filter)
         return account
     }
 
@@ -67,7 +67,7 @@ class AccountService {
             _id: id
         }
 
-        const result = await this.Account.updateOne(filter, { deleted: true })
+        const result = await this.Account.updateOne(filter, { deleted: true, deletedAt: new Date() })
         return result
     }
 }
