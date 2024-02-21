@@ -3,7 +3,7 @@ const router = express.Router()
 
 const roleController = require('../../controllers/admin/role.controller')
 
-router.get('/', roleController.find)
-// router.get('/:slug', categoryController.find)
+router.route('/')
+    .get(roleController.find)
 
 module.exports = router
