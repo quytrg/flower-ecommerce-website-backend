@@ -71,8 +71,8 @@ module.exports.updateOne = async (req, res, next) => {
         const document = await productService.updateOne(id, data)
 
         const { categories } = req.body
-        await productCategoryService.deleteAllCategoriesOfProduct(id)
         if (categories) {
+            await productCategoryService.deleteAllCategoriesOfProduct(id)
             const categoryIds = categories.map(item => item._id)
             await productCategoryService.create(id, categoryIds)
         }
