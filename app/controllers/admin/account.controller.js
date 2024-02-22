@@ -94,10 +94,21 @@ module.exports.create = async (req, res, next) => {
     if (Object.keys(req.body).length === 0) {
         return next(new ApiError(400, "Data update cannot be empty"))
     }
-    
 
     try {
         const accountService = new AccountService()
+
+        // check if account already exists
+        const { email } = req.body
+        const filter = {
+            email,
+            deleted: false
+        }
+        const account = await accountService.findOne(filter)
+        if (account) {
+            res.status(409).send('Email already exists!')
+            return
+        }
  
         // hash password
         if (req.body.password) {
