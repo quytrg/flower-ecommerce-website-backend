@@ -37,23 +37,16 @@ class AccountService {
         return account
     }
 
-    async updateOne(id, payload) {
-        const filter = {
-            _id: id
-        }
-        
+    async updateOne(filter, payload) {
         const data = this.extractAccountData(payload)
         const result = await this.Account.updateOne(filter, data)
-
         return result
     }
 
     async create(payload) {
         const data = this.extractAccountData(payload)
-
         const result = await this.Account.create(data)
         await result.save()
-
         return result
     }
 
@@ -66,7 +59,6 @@ class AccountService {
         const filter = {
             _id: id
         }
-
         const result = await this.Account.updateOne(filter, { deleted: true, deletedAt: new Date() })
         return result
     }

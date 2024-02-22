@@ -1,4 +1,3 @@
-const md5 = require('md5')
 const ApiError = require('../../middlewares/api-error.js')
 const AuthService = require('../../services/admin/auth.service.js')
 
@@ -15,10 +14,6 @@ module.exports.find = async (req, res, next) => {
         
         if (!account) {
             res.send("EmailNotExist")
-        }
-
-        if (account.password !== md5(req.body.password)) {
-            res.send("WrongPassword")
         }
 
         if (account.status === 'inactive') {

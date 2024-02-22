@@ -1,10 +1,12 @@
 const ApiError = require('../../middlewares/api-error.js')
 const AccountService = require('../../services/admin/account.service.js')
-const md5 = require('md5')
 
 // helpers
 const searchHelper = require('../../helpers/search.helper.js')
 const paginationHelper = require('../../helpers/pagination.helper.js')
+
+// hash password with bcrypt
+const bcrypt = require('bcrypt')
 
 // [GET] /accounts
 module.exports.find = async (req, res, next) => {
@@ -50,24 +52,32 @@ module.exports.find = async (req, res, next) => {
     }
 }
 
-// [PATCH] /accounts/change-status/:id
+// [PATCH] /accounts/:id
 module.exports.updateOne = async (req, res, next) => {
     if (Object.keys(req.body).length === 0) {
         return next(new ApiError(400, "Data update cannot be empty"))
     }
 
     try {
-        const data = { ...req.body }
-        data.password = md5(data.password)
+        // hash password
+        if (req.body.password) {
+            const plainTextPassword = req.body.password;
+            const saltRounds = await bcrypt.genSalt();
+            req.body.password = await bcrypt.hash(plainTextPassword, saltRounds);
+        }
+
+        const filter = {
+            _id: req.params.id
+        }
         
         const accountService = new AccountService()
-        const document = await accountService.updateOne(req.params.id, data)
+        const document = await accountService.updateOne(filter, req.body)
         
         if (!document) {
             return next(new ApiError(404, "Account not found"))
         }
 
-        res.send({
+        res.status(200).json({
             message: "Account was updated successfully",
             updatedDocument: document
         })
@@ -79,40 +89,26 @@ module.exports.updateOne = async (req, res, next) => {
     }
 }
 
-
 // [POST] /accounts/create
 module.exports.create = async (req, res, next) => {
-
-    const accountService = new AccountService()
+    if (Object.keys(req.body).length === 0) {
+        return next(new ApiError(400, "Data update cannot be empty"))
+    }
+    
 
     try {
-        // const data = { ...req.body }
-        // data.price = parseInt(req.body.price)
-        // data.discountPercentage = parseInt(req.body.discountPercentage)
-        // data.stock = parseInt(req.body.stock)
+        const accountService = new AccountService()
+ 
+        // hash password
+        if (req.body.password) {
+            const plainTextPassword = req.body.password;
+            const saltRounds = await bcrypt.genSalt();
+            req.body.password = await bcrypt.hash(plainTextPassword, saltRounds);
+        }
 
-        // if (!req.body?.position) { 
-        //     data.position = await productService.count() + 1
-        // } 
-        // else {
-        //     data.position = parseInt(req.body.position)
-        // }
+        const document = await accountService.create(req.body)
 
-        // if (!req.body?.category || req.body.category === '') {
-        //     data.category = 'fresh-flowers'
-        // }
-
-        // if (req.file) {
-        //     req.body.thumbnail = `/uploads/${req.file.filename}`
-        // }
-
-        const data = { ...req.body }
-
-        data.password = md5(data.password)
-
-        const document = await accountService.create(data)
-
-        res.send({
+        res.status(201).json({
             message: "Create a new account successfully",
             updatedDocument: document
         })
@@ -123,53 +119,6 @@ module.exports.create = async (req, res, next) => {
         )
     }
 }
-
-// [PATCH] /accounts/change-multi
-// module.exports.updateMany = async (req, res, next) => {
-//     if (Object.keys(req.body).length === 0) {
-//         return next(new ApiError(400, "Data update cannot be empty"))
-//     }
-
-//     try {
-//         const productService = new ProductService()
-
-//         const { idList, type } = req.body
-
-//         let document = {}
-
-//         switch (type) {
-//             case 'active':
-//             case 'inactive':
-//                 document = await productService.updateMany(idList, { status: type })
-//                 break 
-//             case 'delete':
-//                 document = await productService.updateMany(idList, {
-//                     deleted: true,
-//                     deletedAt: new Date()
-//                 })
-//                 break
-//             // case 'position':
-//             //     for(const item of idList) {
-//             //         const [ id, position ] = item.split('-')
-//             //         await productService.updateOne({ _id: id }, { position: position })
-//             //     }
-//             //     break
-//             default:
-//                 break
-//         }
-
-//         res.send({
-//             message: "Change state of multiple product successfully",
-//             updatedDocument: document
-//         })
-//     }
-//     catch (err) {
-//         return next(
-//             new ApiError(500, `An error occurred while changing the state of multiple product`)
-//         )
-//     }
-// }
-
 
 // [GET] /accounts/:id
 module.exports.findOne = async (req, res, next) => {
@@ -182,7 +131,7 @@ module.exports.findOne = async (req, res, next) => {
        
         const accountService = new AccountService()
         const account = await accountService.findOne(filter)
-        return res.send(account)
+        return res.json(account)
     }
     catch (err) {
         return next (

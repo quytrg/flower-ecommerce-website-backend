@@ -1,18 +1,31 @@
-const express = require('express')
-const router = express.Router()
+const express = require("express");
+const router = express.Router();
 
-const accountController = require('../../controllers/admin/account.controller')
+// upload files by multer
+const multer = require("multer");
+const upload = multer();
 
-router.patch('/change-status/:id', accountController.updateOne)
-// router.patch('/change-multi', productController.updateMany)
-router.post('/create', accountController.create)
-router.put('/update/:id', accountController.updateOne)
+// middlewares
+const uploadToCloudMiddleware = require("../../middlewares/admin/uploadToCloud.middleware");
 
-router.route('/:id')
+const accountController = require("../../controllers/admin/account.controller");
+
+router.route("/:id")
     .get(accountController.findOne)
     .delete(accountController.deleteOne)
+    .patch(
+        upload.single("avatar"),
+        uploadToCloudMiddleware.uploadImage,
+        accountController.updateOne
+    )
+    
 
-router.route('/')
+router.route("/")
     .get(accountController.find)
+    .post(
+        upload.single("avatar"),
+        uploadToCloudMiddleware.uploadImage,
+        accountController.create
+    );
 
-module.exports = router
+module.exports = router;
