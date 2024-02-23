@@ -3,7 +3,7 @@ const database = require('./app/config/database')
 
 const startServer = async () => {
     try {
-        database.connect()
+        database.connectMongoose()
         
         const port = process.env.PORT
         app.listen(port, () => {
