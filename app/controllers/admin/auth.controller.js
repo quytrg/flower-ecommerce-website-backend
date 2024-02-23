@@ -5,7 +5,7 @@ const AccountService = require('../../services/admin/account.service.js')
 const bcrypt = require('bcrypt')
 
 // helpers
-const generateHelper = require('../../helpers/generate.helper.js')
+const jwtHelper = require('../../helpers/jwt.helper.js')
 
 module.exports.login = async (req, res, next) => {
     try {
@@ -40,9 +40,9 @@ module.exports.login = async (req, res, next) => {
 
         // remove password before returning data
         const { password, ...info } = account._doc
-        
+
         // generate jwt
-        const accessToken = generateHelper.generateJWT(
+        const accessToken = jwtHelper.generate(
             {
                 id: info._id,
                 roleId: info.roleId
@@ -50,7 +50,32 @@ module.exports.login = async (req, res, next) => {
             process.env.JWT_ACCESS_KEY,
             '2h'
         )
-        res.status(200).json({ ...info, accessToken })
+        const refreshToken = jwtHelper.generate(
+            {
+                id: info._id,
+                roleId: info.roleId
+            },
+            process.env.JWT_REFRESH_KEY,
+            '3w'
+        )
+
+        // temporarily save accessToken in cookies -> save in pinia
+        res.cookie('accessToken', accessToken, {
+            httpOnly: true,
+            secure: false, // -> true when deploying
+            path: '/',
+            sameSite: 'strict'
+        })
+
+        // save refreshToken in cookies
+        res.cookie('refreshToken', refreshToken, {
+            httpOnly: true,
+            secure: false, // -> true when deploying
+            path: '/',
+            sameSite: 'strict'
+        })
+
+        res.status(200).json({ ...info, accessToken, refreshToken })
 
     }
     catch (err) {
