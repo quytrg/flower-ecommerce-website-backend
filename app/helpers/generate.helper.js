@@ -1,3 +1,5 @@
+const jwt = require('jsonwebtoken')
+
 module.exports.generateRandomString = (length) => {
     const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 
@@ -9,3 +11,7 @@ module.exports.generateRandomString = (length) => {
 
     return result;
 };
+
+module.exports.generateJWT = (payload, secretKey, expiredTime) => {
+    return jwt.sign(payload, secretKey, { expiresIn: expiredTime })
+}

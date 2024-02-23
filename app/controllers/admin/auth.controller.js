@@ -4,6 +4,9 @@ const AccountService = require('../../services/admin/account.service.js')
 // hash password with bcrypt
 const bcrypt = require('bcrypt')
 
+// helpers
+const generateHelper = require('../../helpers/generate.helper.js')
+
 module.exports.login = async (req, res, next) => {
     try {
         const accountService = new AccountService()
@@ -37,7 +40,17 @@ module.exports.login = async (req, res, next) => {
 
         // remove password before returning data
         const { password, ...info } = account._doc
-        res.status(200).json(info)
+        
+        // generate jwt
+        const accessToken = generateHelper.generateJWT(
+            {
+                id: info._id,
+                roleId: info.roleId
+            },
+            process.env.JWT_ACCESS_KEY,
+            '2h'
+        )
+        res.status(200).json({ ...info, accessToken })
 
     }
     catch (err) {
