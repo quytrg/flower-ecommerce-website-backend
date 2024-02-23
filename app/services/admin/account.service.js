@@ -29,6 +29,7 @@ class AccountService {
                                         .limit(pagination.limit)
                                         .skip(pagination.skip)
                                         .sort(sort)
+                                        .select("-password")
         return accounts
     }
 

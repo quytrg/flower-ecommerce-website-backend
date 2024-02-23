@@ -1,31 +1,48 @@
 const ApiError = require('../../middlewares/api-error.js')
-const AuthService = require('../../services/admin/auth.service.js')
+const AccountService = require('../../services/admin/account.service.js')
 
-module.exports.find = async (req, res, next) => {
+// hash password with bcrypt
+const bcrypt = require('bcrypt')
+
+module.exports.login = async (req, res, next) => {
     try {
-
-        const authService = new AuthService()
+        const accountService = new AccountService()
         
         const filter = {
             email: req.body.email,
             deleted: false
         }
-        const account = await authService.findOne(filter)
+        const account = await accountService.findOne(filter)
         
+        // check if the account exists or not
         if (!account) {
-            res.send("EmailNotExist")
+            res.status(404).send("Email does not exist!")
+            return
         }
 
+        // check password
+        const hashedPassword = account.password
+        const plaintextPassword = req.body.password;
+        const match = await bcrypt.compare(plaintextPassword, hashedPassword);
+        if (!match) {
+            res.status(404).send("Wrong password!")
+            return
+        }
+
+        // check if the account is locked or not
         if (account.status === 'inactive') {
-            res.send("Block")
+            res.status(404).send("Account is locked!")
+            return
         }
 
-        res.cookie('token', account.token)
-        res.send("Success")
+        // remove password before returning data
+        const { password, ...info } = account._doc
+        res.status(200).json(info)
+
     }
     catch (err) {
         return next (
-            new ApiError(500, "An error occurred while logining")
+            new ApiError(500, "An error occurred while logging in")
         )
     }
 }
