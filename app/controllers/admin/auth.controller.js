@@ -7,6 +7,7 @@ const bcrypt = require('bcrypt')
 // helpers
 const jwtHelper = require('../../helpers/jwt.helper.js')
 
+// [POST] /auth/login
 module.exports.login = async (req, res, next) => {
     try {
         const accountService = new AccountService()
@@ -42,7 +43,7 @@ module.exports.login = async (req, res, next) => {
         const { password, ...info } = account._doc
 
         // generate jwt
-        const accessToken = jwtHelper.generate(
+        const accessToken = await jwtHelper.generate(
             {
                 id: info._id,
                 roleId: info.roleId
@@ -50,7 +51,7 @@ module.exports.login = async (req, res, next) => {
             process.env.JWT_ACCESS_KEY,
             '2h'
         )
-        const refreshToken = jwtHelper.generate(
+        const refreshToken = await jwtHelper.generate(
             {
                 id: info._id,
                 roleId: info.roleId
