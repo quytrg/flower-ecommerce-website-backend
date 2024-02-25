@@ -1,5 +1,6 @@
 const express = require('express')
 const cors = require('cors')
+const cookieParser = require('cookie-parser')
 const ApiError = require('./app/middlewares/api-error')
 const clientRouter = require('./app/routes/client/index.route')
 const adminRouter = require('./app/routes/admin/index.route')
@@ -9,6 +10,7 @@ const systemConfig = require('./app/config/system')
 const app = express()
 
 app.use(cors())
+app.use(cookieParser())
 app.use(express.json())
 
 // local variables within the application

@@ -1,4 +1,5 @@
 const jwtHelper = require('../../helpers/jwt.helper')
+const ApiError = require('../../middlewares/api-error.js')
 
 module.exports.requireAuth = async (req, res, next) => {
     try {
@@ -11,13 +12,9 @@ module.exports.requireAuth = async (req, res, next) => {
                 })
                 .catch((err) => {
                     if (err.name === 'JsonWebTokenError') {
-                        return res.status(401).json({
-                            message: err.message
-                        })
+                        return next(new ApiError(401, err.message))
                     }
-                    return res.status(500).json({
-                        message: 'An error occured while verifying authorization'
-                    })
+                    return next(new ApiError(500, 'An error occured while verifying authorization'))
                 })
         }
         else {
@@ -27,8 +24,6 @@ module.exports.requireAuth = async (req, res, next) => {
         }
     }
     catch (error) {
-        return res.status(500).json({
-            message: 'An error occured while requiring authorization'
-        })
+        return next(new ApiError(500, 'An error occured while requiring authorization'))
     }
 }
