@@ -171,3 +171,34 @@ module.exports.refreshToken = async (req, res, next) => {
         )
     }
 }
+
+// [DELETE] /auth/logout
+module.exports.logout = async (req, res, next) => {
+    try {
+        const { refreshToken } = req.cookies
+        if (!refreshToken) {
+            return next(new ApiError(401, 'Unauthorized'))
+        }
+
+        // clear accessToken and refreshToken from cookies
+        res.clearCookie('accessToken')
+        res.clearCookie('refreshToken')
+
+        // delete freshToken from redis
+        const client = await database.connectRedis()
+        await client.del(refreshToken, (err, reply) => {
+            if (err) {
+                return next(new ApiError(500, '"An error occurred while deleting refresh token from redis"'))
+            }
+        })
+
+        res.status(200).json({
+            message: "Log out successfully"
+        })
+    }
+    catch (err) {
+        return next (
+            new ApiError(500, "An error occurred while logging out")
+        )
+    }
+}
