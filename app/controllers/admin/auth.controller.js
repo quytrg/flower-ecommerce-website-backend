@@ -38,7 +38,7 @@ module.exports.login = async (req, res, next) => {
 
         // check if the account is locked or not
         if (account.status === 'inactive') {
-            res.status(401).send("Account is locked!")
+            res.status(403).send("Account is locked!")
             return
         }
 
