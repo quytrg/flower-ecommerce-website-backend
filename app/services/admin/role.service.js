@@ -15,6 +15,11 @@ class RoleService {
         const result = await this.Role.countDocuments(filter)
         return result
     }
+
+    async findOne(filter, select="") {
+        const role = await this.Role.findOne(filter).select(select)
+        return role
+    }
 }
 
 module.exports = RoleService

@@ -6,4 +6,7 @@ const roleController = require('../../controllers/admin/role.controller')
 router.route('/')
     .get(roleController.find)
 
+router.route('/:id')
+    .get(roleController.findById)
+
 module.exports = router

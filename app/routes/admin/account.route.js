@@ -7,7 +7,7 @@ const upload = multer();
 
 // middlewares
 const uploadToCloudMiddleware = require("../../middlewares/admin/uploadToCloud.middleware");
-const authMiddleware = require('../../middlewares/admin/auth.middleware')
+const permissionMiddleware = require("../../middlewares/admin/permission.middleware.js")
 
 const accountController = require("../../controllers/admin/account.controller");
 
@@ -22,7 +22,7 @@ router.route("/:id")
     
 
 router.route("/")
-    .get(authMiddleware.requireAuth, accountController.find)
+    .get(permissionMiddleware.readAccounts, accountController.find)
     .post(
         upload.single("avatar"),
         uploadToCloudMiddleware.uploadImage,
