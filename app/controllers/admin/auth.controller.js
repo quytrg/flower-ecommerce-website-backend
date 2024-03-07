@@ -23,7 +23,7 @@ module.exports.login = async (req, res, next) => {
         
         // check if the account exists or not
         if (!account) {
-            res.status(401).send("Email does not exist!")
+            res.status(401).send("Wrong email or password!")
             return
         }
 
@@ -32,7 +32,7 @@ module.exports.login = async (req, res, next) => {
         const plaintextPassword = req.body.password;
         const match = await bcrypt.compare(plaintextPassword, hashedPassword);
         if (!match) {
-            res.status(401).send("Wrong password!")
+            res.status(401).send("Wrong email or password!")
             return
         }
 
