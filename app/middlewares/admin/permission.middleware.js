@@ -2,7 +2,7 @@ const ApiError = require('../../middlewares/api-error.js')
 
 module.exports.readAccounts = async (req, res, next) => {
     try {
-        if (req.account?.permissions.includes("read_accounts")) {
+        if (req.account.permissions.includes("read_accounts")) {
             next();
         } else {
             return next(new ApiError(403, "Access denied"))
