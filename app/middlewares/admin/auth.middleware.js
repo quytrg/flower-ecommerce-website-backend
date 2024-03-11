@@ -4,8 +4,8 @@ const RoleService = require('../../services/admin/role.service.js')
 
 module.exports.requireAuth = async (req, res, next) => {
     try {
-        if (req.headers.authorization) {
-            const accessToken = req.headers.authorization.split(' ')[1]
+        const { accessToken } = req.cookies
+        if (accessToken) {
             jwtHelper.verify(accessToken, process.env.JWT_ACCESS_KEY)
                 .then(async (decoded) => {
                     req.account = decoded
@@ -21,8 +21,11 @@ module.exports.requireAuth = async (req, res, next) => {
                     next()
                 })
                 .catch((err) => {
-                    if (err.name === 'JsonWebTokenError') {
-                        return next(new ApiError(401, err.message))
+                    if (err.name === 'TokenExpiredError') {
+                        return res.json({
+                            code: 401,
+                            message: err.message
+                        })
                     }
                     return next(new ApiError(500, 'An error occured while verifying authorization'))
                 })

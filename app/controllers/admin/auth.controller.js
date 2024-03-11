@@ -52,7 +52,7 @@ module.exports.login = async (req, res, next) => {
                 roleId: info.roleId
             },
             process.env.JWT_ACCESS_KEY,
-            '2h'
+            '30s'
         )
         .catch((err) => {
             return next(new ApiError(500, err.message))
@@ -79,7 +79,7 @@ module.exports.login = async (req, res, next) => {
         await client.expire(info._id.toString(), 60 * 24 * 60 * 60)
         await client.disconnect()
 
-        // temporarily save accessToken in cookies -> save in pinia
+        // save refreshToken to cookies
         res.cookie('accessToken', accessToken, {
             httpOnly: true,
             secure: false, // -> true when deploying
@@ -87,7 +87,7 @@ module.exports.login = async (req, res, next) => {
             sameSite: 'strict'
         })
 
-        // save refreshToken in cookies
+        // save refreshToken to cookies
         res.cookie('refreshToken', refreshToken, {
             httpOnly: true,
             secure: false, // -> true when deploying
@@ -105,10 +105,11 @@ module.exports.login = async (req, res, next) => {
     }
 }
 
-// [POST] /auth/refresh-token
+// [GET] /auth/refresh-token
 module.exports.refreshToken = async (req, res, next) => {
     try {
         const { refreshToken } = req.cookies
+        console.log(refreshToken)
         if (!refreshToken) {
             return next(new ApiError(401, "You're not authenticated"))
         }
@@ -116,7 +117,7 @@ module.exports.refreshToken = async (req, res, next) => {
         // verify refresh token
         const { iat, exp, ...payload } = await jwtHelper.verify(refreshToken, process.env.JWT_REFRESH_KEY)
                                     .catch((err) => {
-                                        if (err.name === 'JsonWebTokenError') {
+                                        if (err.name === 'JsonWebTokenError' || err.name === 'TokenExpiredError') {
                                             return next(new ApiError(401, err.message))
                                         }
                                         return next(new ApiError(500, 'An error occured while verifying authorization'))
@@ -134,7 +135,7 @@ module.exports.refreshToken = async (req, res, next) => {
         }
 
         // generate new tokens
-        const newAccessToken = await jwtHelper.generate(payload, process.env.JWT_ACCESS_KEY, '2h')
+        const newAccessToken = await jwtHelper.generate(payload, process.env.JWT_ACCESS_KEY, '30s')
         const newRefreshToken = await jwtHelper.generate(payload, process.env.JWT_REFRESH_KEY, '60d')
 
         // save refresh token to redis
@@ -146,7 +147,7 @@ module.exports.refreshToken = async (req, res, next) => {
         await client.expire(payload.id, 60 * 24 * 60 * 60)
         await client.disconnect()
 
-        // save refreshToken in cookies
+        // save token to cookies
         res.cookie('accessToken', newAccessToken, {
             httpOnly: true,
             secure: false, // -> true when deploying
