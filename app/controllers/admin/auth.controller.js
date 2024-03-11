@@ -46,13 +46,15 @@ module.exports.login = async (req, res, next) => {
         const { password, ...info } = account._doc
 
         // generate jwt
+        const accessTokenExpire = 1 * 60 * 60 // 1h in seconds
+        const refreshTokenExpire = 60 * 24 * 60 * 60 // 60 days in seconds
         const accessToken = await jwtHelper.generate(
             {
                 id: info._id,
                 roleId: info.roleId
             },
             process.env.JWT_ACCESS_KEY,
-            '30s'
+            `${accessTokenExpire}s`
         )
         .catch((err) => {
             return next(new ApiError(500, err.message))
@@ -63,7 +65,7 @@ module.exports.login = async (req, res, next) => {
                 roleId: info.roleId
             },
             process.env.JWT_REFRESH_KEY,
-            '60d'
+            `${refreshTokenExpire}s`
         )
         .catch((err) => {
             return next(new ApiError(500, err.message))
@@ -71,31 +73,32 @@ module.exports.login = async (req, res, next) => {
 
         // save refresh token to redis
         const client = await database.connectRedis()
-        await client.set(info._id.toString(), refreshToken, (err, replay) => {
+        await client.set(info._id.toString(), refreshToken, (err, reply) => {
             if (err) {
                 return next(new ApiError(500, 'An error occurred while saving refresh token to redis'))
             }
         })
-        await client.expire(info._id.toString(), 60 * 24 * 60 * 60)
+        await client.expire(info._id.toString(), refreshTokenExpire)
         await client.disconnect()
 
         // save refreshToken to cookies
         res.cookie('accessToken', accessToken, {
             httpOnly: true,
-            secure: false, // -> true when deploying
+            secure: true,
             path: '/',
-            sameSite: 'strict'
+            sameSite: 'strict',
         })
 
         // save refreshToken to cookies
         res.cookie('refreshToken', refreshToken, {
             httpOnly: true,
-            secure: false, // -> true when deploying
+            secure: true,
             path: '/',
-            sameSite: 'strict'
+            sameSite: 'strict',
+            expires : new Date(Date.now() + refreshTokenExpire * 1000) // milliseconds
         })
 
-        res.status(200).json({ ...info, accessToken, refreshToken })
+        res.status(200).json(info)
 
     }
     catch (err) {
@@ -105,11 +108,10 @@ module.exports.login = async (req, res, next) => {
     }
 }
 
-// [GET] /auth/refresh-token
+// [PATCH] /auth/refresh-token
 module.exports.refreshToken = async (req, res, next) => {
     try {
         const { refreshToken } = req.cookies
-        console.log(refreshToken)
         if (!refreshToken) {
             return next(new ApiError(401, "You're not authenticated"))
         }
@@ -135,8 +137,11 @@ module.exports.refreshToken = async (req, res, next) => {
         }
 
         // generate new tokens
-        const newAccessToken = await jwtHelper.generate(payload, process.env.JWT_ACCESS_KEY, '30s')
-        const newRefreshToken = await jwtHelper.generate(payload, process.env.JWT_REFRESH_KEY, '60d')
+        const accessTokenExpire = 1 * 60 * 60 // 1h in seconds
+        const refreshTokenExpire = 60 * 24 * 60 * 60 // 60 days in seconds
+
+        const newAccessToken = await jwtHelper.generate(payload, process.env.JWT_ACCESS_KEY, `${accessTokenExpire}s`)
+        const newRefreshToken = await jwtHelper.generate(payload, process.env.JWT_REFRESH_KEY, `${refreshTokenExpire}s`)
 
         // save refresh token to redis
         await client.set(payload.id, newRefreshToken, (err, reply) => {
@@ -144,26 +149,26 @@ module.exports.refreshToken = async (req, res, next) => {
                 return next(new ApiError(500, 'An error occurred while saving refresh token to redis'))
             }
         })
-        await client.expire(payload.id, 60 * 24 * 60 * 60)
+        await client.expire(payload.id, refreshTokenExpire)
         await client.disconnect()
 
         // save token to cookies
         res.cookie('accessToken', newAccessToken, {
             httpOnly: true,
-            secure: false, // -> true when deploying
+            secure: true,
             path: '/',
-            sameSite: 'strict'
+            sameSite: 'strict',
         })
         res.cookie('refreshToken', newRefreshToken, {
             httpOnly: true,
-            secure: false, // -> true when deploying
+            secure: true,
             path: '/',
-            sameSite: 'strict'
+            sameSite: 'strict',
+            expires : new Date(Date.now() + refreshTokenExpire * 1000) // milliseconds
         })
 
         return res.status(200).json({
-            accessToken: newAccessToken,
-            refreshToken: newRefreshToken
+            message: 'Refresh token succussfully'
         })
     }
     catch (err) {
@@ -189,7 +194,7 @@ module.exports.logout = async (req, res, next) => {
         const client = await database.connectRedis()
         await client.del(refreshToken, (err, reply) => {
             if (err) {
-                return next(new ApiError(500, '"An error occurred while deleting refresh token from redis"'))
+                return next(new ApiError(500, "An error occurred while deleting refresh token from redis"))
             }
         })
 
