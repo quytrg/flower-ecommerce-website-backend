@@ -50,8 +50,9 @@ module.exports.requireAuth = async (req, res, next) => {
                 })
         }
         else {
-            return res.status(401).json({
-                message: 'Request needs authorization'
+            return res.json({
+                code: 401,
+                message: 'jwt required'
             })
         }
     }
