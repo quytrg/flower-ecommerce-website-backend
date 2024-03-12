@@ -33,8 +33,8 @@ class AccountService {
         return accounts
     }
 
-    async findOne(filter) {
-        const account = await this.Account.findOne(filter)
+    async findOne(filter, select="") {
+        const account = await this.Account.findOne(filter).select(select)
         return account
     }
 

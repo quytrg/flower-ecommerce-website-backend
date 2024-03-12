@@ -1,6 +1,7 @@
 const jwtHelper = require('../../helpers/jwt.helper')
 const ApiError = require('../../middlewares/api-error.js')
 const RoleService = require('../../services/admin/role.service.js')
+const AccountService = require('../../services/admin/account.service.js')
 
 module.exports.requireAuth = async (req, res, next) => {
     try {
@@ -9,7 +10,7 @@ module.exports.requireAuth = async (req, res, next) => {
             jwtHelper.verify(accessToken, process.env.JWT_ACCESS_KEY)
                 .then(async (decoded) => {
                     req.account = decoded
-
+                    const accountService = new AccountService()
                     const account = await accountService.findOne({
                         _id: req.account.id,
                         deleted: false
