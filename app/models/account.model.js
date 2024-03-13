@@ -14,7 +14,6 @@ const accountSchema = new Schema({
         required: true,
         minlength: 1
     },
-    token: String,
     phone: String,
     avatar: String,
     roleId: String,

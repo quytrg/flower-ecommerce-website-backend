@@ -210,23 +210,13 @@ module.exports.logout = async (req, res, next) => {
 }
 
 // [GET] /auth/me
-module.exports.info = async (req, res, next) => {
+module.exports.getAuth = async (req, res, next) => {
     try {
-        const accountService = new AccountService()
-        const filter = {
-            _id: req.account.id,
-            deleted: false
-        }
-        const select = "-password"
-        const account = await accountService.findOne(filter, select)
-        if (!account) {
-            return next(new ApiError(404, "Account not found"))
-        }
-        return res.status(200).json(account)
+        return res.status(200).json(req.account)
     }
     catch (err) {
         return next (
-            new ApiError(500, "An error occurred while getting info of account")
+            new ApiError(500, "An error occurred while getting auth of account")
         )
     }
 }

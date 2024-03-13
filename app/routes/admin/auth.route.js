@@ -12,6 +12,6 @@ router.patch('/refresh-token', authController.refreshToken)
 
 router.delete('/logout', authMiddleware.requireAuth, authController.logout)
 
-router.get('/me', authMiddleware.requireAuth, authController.info)
+router.get('/me', authMiddleware.requireAuth, authController.getAuth)
 
 module.exports = router

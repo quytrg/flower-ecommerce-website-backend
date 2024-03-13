@@ -9,12 +9,13 @@ module.exports.requireAuth = async (req, res, next) => {
         if (accessToken) {
             jwtHelper.verify(accessToken, process.env.JWT_ACCESS_KEY)
                 .then(async (decoded) => {
-                    req.account = decoded
+                    const { id, roleId } = decoded
                     const accountService = new AccountService()
+                    const accountSelect = "-password -deleted -deletedAt -updatedAt -__v"
                     const account = await accountService.findOne({
-                        _id: req.account.id,
+                        _id: id,
                         deleted: false
-                    })
+                    }, accountSelect)
                     // check if the account exists or not
                     if (!account) {
                         return res.status(404).json({
@@ -27,15 +28,16 @@ module.exports.requireAuth = async (req, res, next) => {
                             message: "Account is locked"
                         })
                     }
+                    req.account = account._doc
 
                     // retrieving role info
                     const roleService = new RoleService()
                     const filter = {
-                        _id: req.account.roleId,
+                        _id: roleId,
                         deleted: false
                     }
-                    const select = 'permissions'
-                    const role = await roleService.findOne(filter, select)
+                    const roleSelect = 'permissions'
+                    const role = await roleService.findOne(filter, roleSelect)
                     req.account.permissions = role.permissions
                     next()
                 })
