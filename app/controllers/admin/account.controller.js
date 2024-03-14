@@ -39,13 +39,10 @@ module.exports.find = async (req, res, next) => {
 
         const accounts = await accountService.find(filter, paginationObject)
         return res.json({
-            info: {
-                accounts,
-                totalPages: paginationObject.totalPages,
-                limit: paginationObject.limit,
-                skip: paginationObject.skip
-            },
-            permissions: req.account.permissions
+            accounts,
+            totalPages: paginationObject.totalPages,
+            limit: paginationObject.limit,
+            skip: paginationObject.skip
         })
     }
     catch (err) {
