@@ -61,6 +61,12 @@ module.exports.updateOne = async (req, res, next) => {
     try {
         // hash password
         if (req.body.password) {
+            // check if password confirmation is match or not
+            if (req.body.password !== req.body.confirmPassword) {
+                return res.status(400).json({
+                    message: 'Passwords do not match'
+                })
+            }
             const plainTextPassword = req.body.password;
             const saltRounds = await bcrypt.genSalt();
             req.body.password = await bcrypt.hash(plainTextPassword, saltRounds);
@@ -69,7 +75,7 @@ module.exports.updateOne = async (req, res, next) => {
         const filter = {
             _id: req.params.id
         }
-        
+
         const accountService = new AccountService()
         const document = await accountService.updateOne(filter, req.body)
         
@@ -109,7 +115,12 @@ module.exports.create = async (req, res, next) => {
             res.status(409).send('Email already exists!')
             return
         }
- 
+        // check if password confirmation is match ot not
+        if (req.body.password !== req.body.confirmPassword) {
+            return res.status(400).json({
+                message: 'Passwords do not match'
+            })
+        }
         // hash password
         if (req.body.password) {
             const plainTextPassword = req.body.password;
