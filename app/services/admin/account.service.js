@@ -24,7 +24,7 @@ class AccountService {
         return account
     }
 
-    async find(filter, pagination, sort={ position: 'desc' }) {
+    async find(filter, pagination, sort={ fullName: 'asc' }) {
         const accounts = await this.Account.find(filter)
                                         .limit(pagination.limit)
                                         .skip(pagination.skip)
