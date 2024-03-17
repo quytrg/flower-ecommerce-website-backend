@@ -145,14 +145,15 @@ module.exports.create = async (req, res, next) => {
 // [GET] /accounts/:id
 module.exports.findOne = async (req, res, next) => {
     try {
+        const accountService = new AccountService()
+
         const { id } = req.params
         const filter = {
             _id: id,
             deleted: false,
         }
-       
-        const accountService = new AccountService()
-        const account = await accountService.findOne(filter)
+       const select = "-password -deleted -deletedAt -updatedAt -__v"
+        const account = await accountService.findOne(filter, select)
         return res.json(account)
     }
     catch (err) {
