@@ -22,6 +22,11 @@ module.exports.find = async (req, res, next) => {
             filter.status = req.query.status
         }
 
+        // filter by role
+        if (req.query.roleId) {
+            filter.roleId = req.query.roleId
+        }
+
         // seach
         if (req.query.keyword) {
             const searchObj = searchHelper(req.query)
