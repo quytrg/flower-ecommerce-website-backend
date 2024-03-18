@@ -38,6 +38,7 @@ module.exports.requireAuth = async (req, res, next) => {
                     }
                     const roleSelect = 'permissions'
                     const role = await roleService.findOne(filter, roleSelect)
+                    req.account.roleTitle = role.title
                     req.account.permissions = role.permissions
                     next()
                 })
