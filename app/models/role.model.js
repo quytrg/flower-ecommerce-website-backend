@@ -13,6 +13,10 @@ const roleSchema = new Schema({
         default: false,
     },
     deletedAt: Date,
+    status: {
+        type: String,
+        default: 'active'
+    }
 }, { timestamps: true })
 
 const Role = mongoose.model("Role", roleSchema, "roles");
