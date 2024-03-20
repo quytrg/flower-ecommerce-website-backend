@@ -3,6 +3,20 @@ class RoleService {
         this.Role = require('../../models/role.model')
     }
 
+    extractData(payload) {
+        const role = {
+            title: payload.title,
+            description: payload.description,
+            status: payload.status
+        }
+        
+        Object.keys(role).forEach(key => (
+            role[key] === undefined && delete role[key]
+        ))
+
+        return role
+    }
+
     async find(filter, pagination, sort={ position: 'desc' }) {
         const role = await this.Role.find(filter)
                                         .limit(pagination.limit)
@@ -19,6 +33,13 @@ class RoleService {
     async findOne(filter, select="") {
         const role = await this.Role.findOne(filter).select(select)
         return role
+    }
+
+    async create(payload) {
+        const data = this.extractData(payload)
+        const result = await this.Role.create(data)
+        await result.save()
+        return result
     }
 }
 

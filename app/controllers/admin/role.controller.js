@@ -43,7 +43,7 @@ module.exports.find = async (req, res, next) => {
     }
     catch (err) {
         return next (
-            new ApiError(500, "An error occurred while retrieving the products")
+            new ApiError(500, "An error occurred while retrieving the roles")
         )
     }
 }
@@ -65,5 +65,28 @@ module.exports.findById = async (req, res, next) => {
     }
     catch (err) {
         return next(new ApiError(500, "An error occured while retrieving a role"))
+    }
+}
+
+// [POST] /roles/
+module.exports.create = async (req, res, next) => {
+    if (Object.keys(req.body).length === 0) {
+        return next(new ApiError(400, "Data update cannot be empty"))
+    }
+
+    try {
+        const roleService = new RoleService()
+
+        const document = await roleService.create(req.body)
+
+        res.status(201).json({
+            message: "Create a new role successfully",
+            newDocument: document
+        })
+    }
+    catch (err) {
+        return next(
+            new ApiError(500, `An error occurred while creating a new role`)
+        )
     }
 }
