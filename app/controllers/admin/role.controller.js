@@ -90,3 +90,34 @@ module.exports.create = async (req, res, next) => {
         )
     }
 }
+
+// [PATCH] /roles/:id
+module.exports.updateOne = async (req, res, next) => {
+    if (Object.keys(req.body).length === 0) {
+        return next(new ApiError(400, "Data update cannot be empty"))
+    }
+
+    try {
+        const filter = {
+            _id: req.params.id,
+            deleted: false
+        }
+
+        const roleService = new RoleService()
+        const document = await roleService.updateOne(filter, req.body)
+        
+        if (!document) {
+            return next(new ApiError(404, "Role not found"))
+        }
+
+        res.status(200).json({
+            message: "Role was updated successfully",
+            updatedDocument: document
+        })
+    }
+    catch (err) {
+        return next(
+            new ApiError(500, `Error updating role with id: ${req.params.id}`)
+        )
+    }
+}

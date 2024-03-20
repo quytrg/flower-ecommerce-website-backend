@@ -41,6 +41,12 @@ class RoleService {
         await result.save()
         return result
     }
+
+    async updateOne(filter, payload) {
+        const data = this.extractData(payload)
+        const result = await this.Role.updateOne(filter, data)
+        return result
+    }
 }
 
 module.exports = RoleService

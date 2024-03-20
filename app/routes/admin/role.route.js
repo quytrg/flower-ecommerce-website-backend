@@ -9,5 +9,6 @@ router.route('/')
 
 router.route('/:id')
     .get(roleController.findById)
+    .patch(roleController.updateOne)
 
 module.exports = router
