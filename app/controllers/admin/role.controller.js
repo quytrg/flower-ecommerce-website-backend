@@ -142,3 +142,35 @@ module.exports.deleteOne = async (req, res, next) => {
         )
     }
 }
+
+// [PATCH] /roles/updatePermission
+module.exports.updatePermission = async (req, res, next) => {
+    if (Object.keys(req.body).length === 0) {
+        return next(new ApiError(400, "Data update cannot be empty"))
+    }
+
+    try {
+        const roleService = new RoleService()
+
+        const { roles } = req.body
+        const documents = []
+        for (const role of roles) {
+            const filter = {
+                _id: role._id,
+                deleted: false
+            }
+            const doc = await roleService.updateOne(filter, { permissions: role.permissions })
+            documents.push(doc)
+        }
+
+        res.status(200).json({
+            message: "Permission was updated successfully",
+            updatedDocument: documents
+        })
+    }
+    catch (err) {
+        return next(
+            new ApiError(500, `Error updating permission`)
+        )
+    }
+}

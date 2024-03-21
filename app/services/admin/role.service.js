@@ -9,7 +9,8 @@ class RoleService {
             description: payload.description,
             status: payload.status,
             deleted: payload.deleted,
-            deletedAt: payload.deletedAt
+            deletedAt: payload.deletedAt,
+            permissions: payload.permissions
         }
         
         Object.keys(role).forEach(key => (
