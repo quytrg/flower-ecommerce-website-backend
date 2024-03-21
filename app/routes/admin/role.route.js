@@ -10,5 +10,6 @@ router.route('/')
 router.route('/:id')
     .get(roleController.findById)
     .patch(roleController.updateOne)
-
+    .delete(roleController.deleteOne)
+    
 module.exports = router

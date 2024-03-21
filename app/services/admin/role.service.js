@@ -7,7 +7,9 @@ class RoleService {
         const role = {
             title: payload.title,
             description: payload.description,
-            status: payload.status
+            status: payload.status,
+            deleted: payload.deleted,
+            deletedAt: payload.deletedAt
         }
         
         Object.keys(role).forEach(key => (
@@ -45,6 +47,14 @@ class RoleService {
     async updateOne(filter, payload) {
         const data = this.extractData(payload)
         const result = await this.Role.updateOne(filter, data)
+        return result
+    }
+
+    async deleteOne(id) {
+        const result = await this.updateOne({ _id: id }, { 
+            deleted: true,
+            deletedAt: new Date()
+        })
         return result
     }
 }

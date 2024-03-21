@@ -121,3 +121,24 @@ module.exports.updateOne = async (req, res, next) => {
         )
     }
 }
+
+// [DELETE] /roles/:id
+module.exports.deleteOne = async (req, res, next) => {
+    try {
+        const { id } = req.params
+
+        const roleService = new RoleService()
+        const document = await roleService.deleteOne(id)
+
+        res.json({
+            code: 200,
+            message: `Delete account ${id} successfully`,
+            document: document
+        })
+    }
+    catch (err) {
+        return next (
+            new ApiError(500, "An error occurred while deleting the account")
+        )
+    }
+}
