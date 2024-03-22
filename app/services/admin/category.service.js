@@ -40,6 +40,21 @@ class CategoryService {
 
         return result
     }
+
+    async findOne(filter, select="") {
+        const category = await this.Category.findOne(filter).select(select)
+        return category
+    }
+
+    async updateOne(id, payload) {
+        const filter = {
+            _id: id,
+            deleted: false
+        }
+        const data = this.extractData(payload)
+        const result = await this.Category.updateOne(filter, data)
+        return result
+    }
 }
 
 module.exports = CategoryService

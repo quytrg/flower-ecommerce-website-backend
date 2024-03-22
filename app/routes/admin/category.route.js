@@ -20,5 +20,14 @@ router.route('/')
 
 router.route('/product/:id')
     .get(categoryController.findCategoriesByProductId)
+    router.route('/')
+
+router.route('/:id')
+    .get(categoryController.findOne)
+    .patch(
+        upload.array('thumbnails', 6),
+        uploadToCloudMiddleware.uploadImage,
+        categoryController.updateOne
+    )
 
 module.exports = router
