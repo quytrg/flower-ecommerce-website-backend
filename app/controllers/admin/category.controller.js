@@ -64,7 +64,6 @@ module.exports.findCategoriesByProductId = async (req, res, next) => {
             status: 'active'
         }
         const categories = await categoryService.find(filter)
-
         res.send(categories)    
     }
     catch (err) {

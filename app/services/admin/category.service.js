@@ -3,10 +3,10 @@ class CategoryService {
         this.Category = require('../../models/category.model')
     }
 
-    async find(filter, pagination, sort={ position: 'desc' }) {
+    async find(filter, pagination={}, sort={ position: 'desc' }) {
         const categories = await this.Category.find(filter)
-                                        .limit(pagination.limit)
-                                        .skip(pagination.skip)
+                                        .limit(pagination?.limit)
+                                        .skip(pagination?.skip)
                                         .sort(sort)
         return categories
     }
