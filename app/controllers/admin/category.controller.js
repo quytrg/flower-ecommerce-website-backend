@@ -72,3 +72,29 @@ module.exports.findCategoriesByProductId = async (req, res, next) => {
         )
     }
 }
+
+// [POST] /categories
+module.exports.create = async (req, res, next) => {
+    try {
+        const categoryService = new CategoryService()
+
+        if (!req.body?.position) { 
+            req.body.position = await categoryService.count({ deleted: false }) + 1
+        } 
+        else {
+            req.body.position = parseInt(req.body.position)
+        }
+
+        const document = await categoryService.create(req.body)
+        
+        res.status(201).json({
+            message: "Create a new category successfully",
+            document: document
+        })
+    }
+    catch (err) {
+        return next(
+            new ApiError(500, `An error occurred while creating a new product`)
+        )
+    }
+}

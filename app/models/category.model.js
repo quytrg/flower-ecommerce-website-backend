@@ -11,8 +11,7 @@ const categorySchema = new Schema({
     },
     status: String,
     description: String,
-    thumbnail1: String,
-    thumbnail2: String,
+    thumbnails: Array,
     position: Number,
     slug: {
         type: String,
