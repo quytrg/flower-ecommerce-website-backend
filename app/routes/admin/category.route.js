@@ -29,5 +29,6 @@ router.route('/:id')
         uploadToCloudMiddleware.uploadImage,
         categoryController.updateOne
     )
+    .delete(categoryController.deleteOne)
 
 module.exports = router

@@ -55,6 +55,15 @@ class CategoryService {
         const result = await this.Category.updateOne(filter, data)
         return result
     }
+
+    async deleteOne(id) {
+        const filter = {
+            _id: id,
+            deleted: false
+        }
+        const result = await this.Category.updateOne(filter, { deleted: true, deletedAt: new Date() })
+        return result
+    }
 }
 
 module.exports = CategoryService

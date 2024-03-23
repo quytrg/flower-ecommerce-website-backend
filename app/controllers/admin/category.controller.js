@@ -147,3 +147,23 @@ module.exports.updateOne = async (req, res, next) => {
         )
     }
 }
+
+// [DELETE] /categories/:id
+module.exports.deleteOne = async (req, res, next) => {
+    try {
+        const { id } = req.params
+
+        const categoryService = new CategoryService()
+        const document = await categoryService.deleteOne(id)
+
+        res.send({
+            message: `Delete category ${id} successfully`,
+            document: document
+        })
+    }
+    catch (err) {
+        return next (
+            new ApiError(500, "An error occurred while deleting the category")
+        )
+    }
+}
