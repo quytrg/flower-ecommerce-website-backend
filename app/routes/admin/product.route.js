@@ -7,26 +7,29 @@ const upload = multer()
 
 // middlewares
 const uploadToCloudMiddleware = require('../../middlewares/admin/uploadToCloud.middleware')
+const permissionMiddleware = require('../../middlewares/admin/permission.middleware')
 
 const productController = require('../../controllers/admin/product.controller')
 
 router.route('/change-multi')
-    .patch(productController.updateMany)
+    .patch(permissionMiddleware.updateProducts, productController.updateMany)
 
 router.route('/:slug')
-    .get(productController.findBySlug)
+    .get(permissionMiddleware.readProducts, productController.findBySlug)
 
 router.route('/:id')
     .patch(
+        permissionMiddleware.updateProducts,
         upload.single('thumbnail'),
         uploadToCloudMiddleware.uploadImage,
         productController.updateOne
     )
-    .delete(productController.deleteOne)
+    .delete(permissionMiddleware.deleteProducts, productController.deleteOne)
 
 router.route('/')
-    .get(productController.find)
+    .get(permissionMiddleware.readProducts, productController.find)
     .post(
+        permissionMiddleware.createProducts,
         upload.single('thumbnail'),
         uploadToCloudMiddleware.uploadImage,
         productController.create

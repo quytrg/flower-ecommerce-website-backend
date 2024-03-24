@@ -10,7 +10,7 @@ const authMiddleware = require('../../middlewares/admin/auth.middleware')
 module.exports = (app) => {
     const ADMIN_PATH = `/${app.locals.apiPrefix}/${app.locals.adminPrefix}`
     app.use(ADMIN_PATH + '/categories', categoryRouter)
-    app.use(ADMIN_PATH + '/products', productRouter)
+    app.use(ADMIN_PATH + '/products', authMiddleware.requireAuth, productRouter)
     app.use(ADMIN_PATH + '/roles', roleRouter)
     app.use(
         ADMIN_PATH + '/accounts',
