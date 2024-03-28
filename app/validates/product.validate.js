@@ -20,7 +20,7 @@ module.exports.validate = async (req, res, next) => {
             return next(new ApiError(400, "Invalid data"))
         }
 
-        if (!req.body.discountPercentage || req.body.discountPercentage < 0) {
+        if (req.body.discountPercentage == null || req.body.discountPercentage == undefined || req.body.discountPercentage < 0) {
             return next(new ApiError(400, "Invalid data"))
         }
 
