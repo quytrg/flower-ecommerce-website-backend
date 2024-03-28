@@ -154,9 +154,6 @@ module.exports.create = async (req, res, next) => {
         const productCategoryService = new ProductCategoryService()
 
         // create product information
-        req.body.price = parseFloat(req.body.price)
-        req.body.discountPercentage = parseInt(req.body.discountPercentage)
-        req.body.stock = parseInt(req.body.stock)
 
         if (!req.body?.position) { 
             req.body.position = await productService.count({ deleted: false }) + 1
