@@ -17,6 +17,9 @@ const productController = require('../../controllers/admin/product.controller')
 router.route('/change-multi')
     .patch(permissionMiddleware.updateProducts, productController.updateMany)
 
+router.route('/change-status/:id')
+    .patch(permissionMiddleware.updateProducts, productValidate.changeStatus, productController.updateOne)
+
 router.route('/:slug')
     .get(permissionMiddleware.readProducts, productController.findBySlug)
 
@@ -24,7 +27,7 @@ router.route('/:id')
     .patch(
         permissionMiddleware.updateProducts,
         upload.single('thumbnail'),
-        productValidate.validate,
+        productValidate.updateProduct,
         uploadToCloudMiddleware.uploadImage,
         productController.updateOne
     )
@@ -35,7 +38,7 @@ router.route('/')
     .post(
         permissionMiddleware.createProducts,
         upload.single('thumbnail'),
-        productValidate.validate,
+        productValidate.createProduct,
         uploadToCloudMiddleware.uploadImage,
         productController.create
     )
