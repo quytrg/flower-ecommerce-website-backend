@@ -11,8 +11,9 @@ module.exports.find = async (req, res, next) => {
             status: 'active',
             deleted: false
         }
-        const products = await productService.find(filter)
-        return res.json(products)
+        const select = "-status -position -deleted -createdBy -updatedBy -deletedBy -deletedAt -updatedAt"
+        const products = await productService.find(filter, select)
+        return res.status(200).json(products)
     }
     catch (err) {
         return next (
@@ -57,7 +58,8 @@ module.exports.findBySlug = async (req, res, next) => {
             deleted: false,
             status: 'active'
         }
-        const product = await productService.findOne(filter)
+        const select = "-status -position -deleted -createdBy -updatedBy -deletedBy -deletedAt -updatedAt"
+        const product = await productService.findOne(filter, select)
         return res.json(product)
     }
     catch (err) {
