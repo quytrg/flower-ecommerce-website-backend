@@ -1,4 +1,4 @@
-API_PREFIX='api'
+API_PREFIX='api-v1'
 CLIENT_PREFIX='client'
 ADMIN_PREFIX='admin'
 
