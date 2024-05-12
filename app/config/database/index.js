@@ -15,10 +15,10 @@ module.exports.connectMongoose = async () => {
 module.exports.connectRedis = async () => {
     try {
         const client = await createClient({
-            password: 'VBeDKVVyilvL6MireoqEIEdhStyoGizj',
+            password: 'tJeMSUlJOurmNOX2odWfr4WgPywxb0Ot',
             socket: {
-                host: 'redis-12294.c292.ap-southeast-1-1.ec2.cloud.redislabs.com',
-                port: 12294
+                host: 'redis-11722.c292.ap-southeast-1-1.ec2.redns.redis-cloud.com',
+                port: 11722
             }
         })
         .on('error', err => console.log('Redis Client Error', err))
