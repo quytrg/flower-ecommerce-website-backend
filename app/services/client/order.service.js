@@ -14,6 +14,7 @@ class OrderService {
             specificAddress: payload.specificAddress,
             payment: payload.payment,
             status: payload.status,
+            method: payload.method,
             totalPrice: payload.totalPrice,
             totalItems: payload.totalItems,
             shipping: payload.shipping,

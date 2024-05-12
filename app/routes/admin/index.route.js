@@ -3,6 +3,7 @@ const productRouter = require('./product.route')
 const roleRouter = require('./role.route')
 const accountRouter = require('./account.route')
 const authRouter = require('./auth.route')
+const orderRouter = require('./order.route')
 
 // middlewares
 const authMiddleware = require('../../middlewares/admin/auth.middleware')
@@ -18,4 +19,5 @@ module.exports = (app) => {
         accountRouter
     )
     app.use(ADMIN_PATH + '/auth', authRouter)
+    app.use(ADMIN_PATH + '/orders', orderRouter)
 }
