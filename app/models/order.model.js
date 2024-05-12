@@ -2,6 +2,7 @@ const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
 const orderSchema = new Schema({
+    orderId: String,
     userId: String,
     fullName: String,
     email: String,
@@ -9,8 +10,11 @@ const orderSchema = new Schema({
     address: String,
     specificAddress: String,
     payment: String,
+    method: String,
     status: String,
     totalPrice: Number,
+    totalItems: Number,
+    shipping: Number,
     deleted: {
         type: Boolean,
         default: false,

@@ -3,7 +3,7 @@ const Schema = mongoose.Schema;
 
 const orderItemSchema = new Schema({
     orderId: String,
-    ProductId: String,
+    productId: String,
     quantity: Number, 
     price: Number,
     discountPercentage: {
